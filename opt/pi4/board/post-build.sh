@@ -37,6 +37,13 @@ rm -rf ${TARGET_DIR}/usr/lib/python3/site-packages/embit/util/prebuilt/libsecp25
 rm -rf ${TARGET_DIR}/usr/lib/python3/site-packages/embit/util/prebuilt/libsecp256k1_linux_x86_64.so
 rm -rf ${TARGET_DIR}/usr/lib/python3/site-packages/embit/util/prebuilt/libsecp256k1_windows_amd64.dll
 
+# Remove embit's pure-Python secp256k1 fallback: we must run only on the pre-compiled
+# libsecp256k1 C code or not at all. We explicitly opt for hard failure over silent
+# fallback.
+# We must delete both the .py and the .pyc to fully remove the fallback.
+rm -f ${TARGET_DIR}/usr/lib/python3/site-packages/embit/util/py_secp256k1.py
+rm -f ${TARGET_DIR}/usr/lib/python3/site-packages/embit/util/py_secp256k1.pyc
+
 # Clean up tests/docs in other python included libs
 rm -rf ${TARGET_DIR}/usr/lib/python3/site-packages/pyzbar/tests
 rm -rf ${TARGET_DIR}/usr/lib/python3/site-packages/qrcode/tests
@@ -189,3 +196,7 @@ find "${TARGET_DIR}" -name '.DS_Store' -print0 | xargs -0 --no-run-if-empty rm -
 SOURCE_DATE_EPOCH=1 PYTHONHASHSEED=0 ${HOST_DIR}/bin/python3.12 \
   "${BUILD_DIR}/python3-3.12.10/Lib/compileall.py" \
   -f --invalidation-mode=checked-hash "${TARGET_DIR}/opt/src"
+
+# Fail the build if embit can't reach the pre-compiled libsecp256k1 or if we detect the
+# pure-python secp256k1 fallback is present.
+"$(dirname "$0")/../../external-packages/python-embit/verify-secp256k1-binary.sh" "${TARGET_DIR}"
