@@ -116,6 +116,7 @@ write_version_json() {
   # version.py silently discards the error, yielding a version.json that bricks boot.
   git config --global --add safe.directory "$(cd "${app_dir}" && pwd)"
 
+  # PYTHONPATH=src is enough; write_versionfile.py's imports are stdlib-only.
   export SEEDSIGNER_OS_BUILDER=1
   # -B (PYTHONDONTWRITEBYTECODE) is required for reproducible builds. Without it CPython
   # caches that import chain as timestamp-invalidated __pycache__/*.pyc 
