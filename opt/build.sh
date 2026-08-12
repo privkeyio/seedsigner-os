@@ -116,9 +116,10 @@ write_version_json() {
   # version.py silently discards the error, yielding a version.json that bricks boot.
   git config --global --add safe.directory "$(cd "${app_dir}" && pwd)"
 
-  # PYTHONPATH=src is enough; write_versionfile.py's imports are stdlib-only.
   export SEEDSIGNER_OS_BUILDER=1
-  (cd "${app_dir}" && PYTHONPATH=src python3 tools/write_versionfile.py) || exit
+  # -B (PYTHONDONTWRITEBYTECODE) is required for reproducible builds. Without it CPython
+  # caches that import chain as timestamp-invalidated __pycache__/*.pyc 
+  (cd "${app_dir}" && PYTHONPATH=src python3 -B tools/write_versionfile.py) || exit
 }
 
 download_app_repo() {
@@ -154,7 +155,10 @@ delete_unnecessary_files() {
   rm -rf ${rootfs_overlay}/opt/enclosures
   rm -rf ${rootfs_overlay}/opt/l10n
   rm -rf ${rootfs_overlay}/opt/seedsigner-screenshots
+  rm -rf ${rootfs_overlay}/opt/src/seedsigner.egg-info
   rm -rf ${rootfs_overlay}/opt/src/seedsigner/resources/seedsigner-translations/.git*
+  rm -rf ${rootfs_overlay}/opt/src/seedsigner/resources/seedsigner-translations/.tx
+  rm -rf ${rootfs_overlay}/opt/src/seedsigner/resources/seedsigner-translations/tools
   rm -rf ${rootfs_overlay}/opt/tests
   rm -rf ${rootfs_overlay}/opt/tools
   # files
@@ -166,6 +170,7 @@ delete_unnecessary_files() {
   rm -rf ${rootfs_overlay}/opt/README.md
   rm -rf ${rootfs_overlay}/opt/requirements-raspi.txt
   rm -rf ${rootfs_overlay}/opt/requirements.txt
+  rm -rf ${rootfs_overlay}/opt/SECURITY.md
   rm -rf ${rootfs_overlay}/opt/seedsigner_pubkey.gpg
   rm -rf ${rootfs_overlay}/opt/setup.*
 
