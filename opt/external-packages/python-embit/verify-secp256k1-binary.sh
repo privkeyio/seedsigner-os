@@ -13,6 +13,20 @@
 #     fails to load, embit no longer raises -- it quietly signs with python
 #     instead, on a device that looks and behaves like a working one. Check 1.
 #
+# This is a gatekeeper for the embit version pinned in python-embit.mk, not a
+# permanent fixture. Both projects are moving the same direction: upstream embit
+# has dropped the prebuilt binaries from its recent releases, on the reasoning
+# that each application is better off compiling libsecp256k1 itself, and there is
+# an open PR there to remove the pure python fallback outright. SeedSigner
+# intends to land in the same place -- no fallback in the tree at all, and our
+# own build of libsecp256k1. At that point checks 3 and 4 describe a layout that
+# no longer exists and this script should be rewritten or retired.
+#
+# Until then it stays deliberately coupled to the layout embit ships today. An
+# embit bump will trip checks 3 and 4 rather than pass quietly, and that is the
+# intended behavior: bumping embit here is a rare and deliberate act, so the
+# build stopping is how it earns the attention it deserves.
+#
 # Usage: verify-secp256k1-binary.sh <target-dir>
 #
 # Called at the end of each board's post-build.sh -- the last thing to touch the
@@ -76,9 +90,13 @@ done
 #    drifted from the set of files embit actually installs.
 #    Same two-part shape as check 1: the scan must complete before an empty
 #    result can be read as "nothing extra".
-if ! EXTRA="$(find "${UTIL_DIR}/prebuilt" -type f \
-	! -name 'libsecp256k1_linux_armv6l.so' \
-	! -name 'libsecp256k1_linux_armv7l.so')"; then
+#    -mindepth 1 rather than -type f, so a symlink or a subdirectory counts as
+#    "something else" too, and -path rather than -name, so the two exemptions
+#    apply to those exact two entries and not to any file that merely shares
+#    their basename further down.
+if ! EXTRA="$(find "${UTIL_DIR}/prebuilt" -mindepth 1 \
+	! -path "${UTIL_DIR}/prebuilt/libsecp256k1_linux_armv6l.so" \
+	! -path "${UTIL_DIR}/prebuilt/libsecp256k1_linux_armv7l.so")"; then
 	fail "could not scan ${UTIL_DIR}/prebuilt -- see find's errors above"
 fi
 if [ -n "${EXTRA}" ]; then
