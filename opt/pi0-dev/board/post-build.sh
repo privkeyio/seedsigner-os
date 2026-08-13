@@ -61,6 +61,13 @@ rm -rf ${TARGET_DIR}/usr/lib/python3/site-packages/embit/util/prebuilt/libsecp25
 rm -rf ${TARGET_DIR}/usr/lib/python3/site-packages/embit/util/prebuilt/libsecp256k1_linux_x86_64.so
 rm -rf ${TARGET_DIR}/usr/lib/python3/site-packages/embit/util/prebuilt/libsecp256k1_windows_amd64.dll
 
+# Remove embit's pure-Python secp256k1 fallback: we must run only on the pre-compiled
+# libsecp256k1 C code or not at all. We explicitly opt for hard failure over silent
+# fallback.
+# We must delete both the .py and the .pyc to fully remove the fallback.
+rm -f ${TARGET_DIR}/usr/lib/python3/site-packages/embit/util/py_secp256k1.py
+rm -f ${TARGET_DIR}/usr/lib/python3/site-packages/embit/util/py_secp256k1.pyc
+
 # Dev convenience: make `python3 -m venv DIR` produce a usable venv by default.
 # This image's Python is built --without-ensurepip and carries the app's native
 # deps (PIL/numpy/embit/...) only in the system site-packages, so the two useful
