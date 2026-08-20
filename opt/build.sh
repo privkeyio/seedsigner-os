@@ -47,10 +47,12 @@ compile_translations_and_fonts() {
 
   ss_translations_repo="./src/seedsigner/resources/seedsigner-translations"
 
-  # install depedencies for babel and fonttools(pyftsubset)
-  pip install babel || exit
-  pip install fonttools || exit
-  pip install -e . || exit
+  # install pinned, hash-locked dependencies: babel + setuptools come from the
+  # app repo's own l10n requirements; fonttools (pyftsubset) is a build-only
+  # addition pinned in this repo (see requirements-l10n-build.txt).
+  # --require-hashes fails the build if either file regresses to unhashed pins.
+  pip install --require-hashes -r l10n/requirements-l10n.txt || exit
+  pip install --require-hashes -r "${cur_dir}/requirements-l10n-build.txt" || exit
 
   # remove any existing binary mo files if they exist
   rm -rf ${ss_translations_repo}/l10n/**/**/*.mo
