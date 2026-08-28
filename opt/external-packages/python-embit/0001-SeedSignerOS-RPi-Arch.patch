@@ -3,10 +3,18 @@ From: Nick Klockenga <nick@klockenga.net>
 Date: Fri, 5 Jul 2024 09:03:05 -0400
 Subject: [PATCH] SeedSignerOS RPi Arch
 
+Ship only the ARM prebuilt libsecp256k1, since that is the only one this
+image can use.
+
+The upstream version of this patch also trimmed src/embit.egg-info/SOURCES.txt.
+That file exists only in a PyPI sdist, not in an archive produced from the git
+tree, so the hunk failed to apply and stopped the build. It was redundant in any
+case: SOURCES.txt is generated metadata, the packaging restriction below is what
+actually decides which files are installed, and post-build.sh removes the
+non-ARM libraries from the target regardless.
 ---
- pyproject.toml                 | 2 +-
- src/embit.egg-info/SOURCES.txt | 5 -----
- 2 files changed, 1 insertion(+), 6 deletions(-)
+ pyproject.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/pyproject.toml b/pyproject.toml
 index fb8fcfe..aa2063c 100644
@@ -21,24 +29,3 @@ index fb8fcfe..aa2063c 100644
  
  
  [tool.pytest.ini_options]
-diff --git a/src/embit.egg-info/SOURCES.txt b/src/embit.egg-info/SOURCES.txt
-index 59b84e9..36d152d 100644
---- a/src/embit.egg-info/SOURCES.txt
-+++ b/src/embit.egg-info/SOURCES.txt
-@@ -50,13 +50,8 @@ src/embit/util/key.py
- src/embit/util/py_ripemd160.py
- src/embit/util/py_secp256k1.py
- src/embit/util/secp256k1.py
--src/embit/util/prebuilt/libsecp256k1_darwin_arm64.dylib
--src/embit/util/prebuilt/libsecp256k1_darwin_x86_64.dylib
--src/embit/util/prebuilt/libsecp256k1_linux_aarch64.so
- src/embit/util/prebuilt/libsecp256k1_linux_armv6l.so
- src/embit/util/prebuilt/libsecp256k1_linux_armv7l.so
--src/embit/util/prebuilt/libsecp256k1_linux_x86_64.so
--src/embit/util/prebuilt/libsecp256k1_windows_amd64.dll
- src/embit/wordlists/__init__.py
- src/embit/wordlists/base.py
- src/embit/wordlists/bip39.py
--- 
-2.39.3 (Apple Git-146)
-
