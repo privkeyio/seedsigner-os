@@ -1,5 +1,5 @@
 # sha256 of the tarball published at
-# https://github.com/privkeyio/embit/releases/tag/v0.8.0-unified-sighash.1
+# https://github.com/privkeyio/embit/releases/tag/v0.8.0-unified-sighash.3
 # Reproducible from the tag with:
-#   git archive --format=tar.gz --prefix=embit-0.8.0-unified-sighash.1/ v0.8.0-unified-sighash.1
-sha256	b53bfec3a7e4c5c7ed948f7e049f9fcb8b7bee241c3c367c5ef4b41be3f2e847  embit-0.8.0-unified-sighash.1.tar.gz
+#   git archive --format=tar.gz --prefix=embit-0.8.0-unified-sighash.3/ v0.8.0-unified-sighash.3
+sha256	435daa985dea6391f62a5dc4bc45f6a021ea42e211be084ea63f9e06a9cd7751  embit-0.8.0-unified-sighash.3.tar.gz
